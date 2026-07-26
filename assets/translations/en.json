@@ -1,0 +1,38 @@
+{
+  "static": {
+    "lang": "en"
+  },
+  "home": {
+    "title": "Weather",
+    "emptyStateHint": "Search for a city to see the current weather"
+  },
+  "search": {
+    "hint": "Enter city name"
+  },
+  "weather": {
+    "offlineBadge": "Offline — showing last saved data",
+    "feelsLike": "Feels like",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "celsius": "°C",
+    "fahrenheit": "°F",
+    "kph": "km/h",
+    "mph": "mph"
+  },
+  "errors": {
+    "emptyCity": "Please enter a city name.",
+    "cityNotFound": "City not found. Please check the spelling and try again.",
+    "network": "Please check your internet connection and try again.",
+    "unknown": "Something went wrong, please try again.",
+    "retry": "Retry"
+  },
+  "settings": {
+    "title": "Settings",
+    "unitsLabel": "Temperature unit",
+    "speedUnitLabel": "Wind speed unit",
+    "languageLabel": "Language",
+    "englishLanguageName": "English",
+    "arabicLanguageName": "العربية",
+    "save": "Save"
+  }
+}

@@ -1,0 +1,41 @@
+name: weather_app
+description: "A Flutter weather app — search a city and see its current weather."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  dio: ^5.9.0
+  get_it: ^9.2.0
+  shared_preferences: ^2.5.4
+  flutter_screenutil: ^5.9.3
+
+
+  easy_localization: ^3.0.8
+  flutter_svg: ^2.3.0
+  flutter_svg_provider: ^1.0.7
+  crypto: ^3.0.7
+  shimmer: ^3.0.0
+  path_provider: ^2.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_gen_runner: ^5.11.0
+  flutter_gen: ^5.11.0
+  build_runner: ^2.7.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/translations/
+    - assets/images/

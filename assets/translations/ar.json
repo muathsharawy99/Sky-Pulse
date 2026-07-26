@@ -1,0 +1,38 @@
+{
+  "static": {
+    "lang": "ar"
+  },
+  "home": {
+    "title": "الطقس",
+    "emptyStateHint": "ابحث عن مدينة لمعرفة حالة الطقس الحالية"
+  },
+  "search": {
+    "hint": "أدخل اسم المدينة"
+  },
+  "weather": {
+    "offlineBadge": "غير متصل — يتم عرض آخر بيانات محفوظة",
+    "feelsLike": "الإحساس بالحرارة",
+    "humidity": "الرطوبة",
+    "wind": "الرياح",
+    "celsius": "°م",
+    "fahrenheit": "°ف",
+    "kph": "كم/س",
+    "mph": "ميل/س"
+  },
+  "errors": {
+    "emptyCity": "الرجاء إدخال اسم المدينة.",
+    "cityNotFound": "المدينة غير موجودة. يرجى التحقق من التهجئة والمحاولة مرة أخرى.",
+    "network": "يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.",
+    "unknown": "حدث خطأ ما، يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "unitsLabel": "وحدة درجة الحرارة",
+    "speedUnitLabel": "وحدة سرعة الرياح",
+    "languageLabel": "اللغة",
+    "englishLanguageName": "English",
+    "arabicLanguageName": "العربية",
+    "save": "حفظ"
+  }
+}
