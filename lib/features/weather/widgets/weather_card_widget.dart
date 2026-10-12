@@ -1,20 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:weather_app/core/shared/widgets/custom_image.dart';
+import 'package:weather_app/core/extensions/unified_extensions.dart';
+import 'package:weather_app/gen/locale_keys.g.dart';
 
-import '../../../core/extensions/speed_unit.dart';
-import '../../../core/extensions/temp_unit.dart';
-import '../../../core/extensions/text_style_extensions.dart';
-import '../../../generated/locale_keys.g.dart';
-import '../data/weather_model.dart';
+import '../data/models/weather_model.dart';
 import '../utils/weather_formatters.dart';
 import '../utils/weather_theme.dart';
-
 import 'offline_badge_widget.dart';
 import 'weather_stat_widget.dart';
 
-/// The main weather card — city name, temp, condition, icon, and stats.
+/// City, temperature, condition, icon and stats on the day / night gradient.
 class WeatherCardWidget extends StatelessWidget {
   const WeatherCardWidget({
     super.key,
@@ -31,24 +27,24 @@ class WeatherCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDay = weather.current.isDay;
+    final current = weather.current;
+    final onCard = context.onPrimary;
+    final mutedOnCard = onCard.withValues(alpha: 0.75);
 
-    // Animated so the gradient crossfades between cities instead of
-    // hard-cutting.
+    // Animated so the gradient cross-fades between cities.
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
+      duration: AppConstants.themeAnimation,
       curve: Curves.easeInOut,
       width: double.infinity,
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(AppSize.s20.w),
       decoration: BoxDecoration(
-        gradient: weatherGradient(isDay),
-        borderRadius: BorderRadius.circular(20.r),
-        // Faint outline so the card still reads as its own panel.
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        gradient: weatherGradient(current.isDay),
+        borderRadius: BorderRadius.circular(AppSize.radiusCard.r),
+        border: Border.all(color: onCard.withValues(alpha: 0.15)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 16,
+            color: context.shadowColor.withValues(alpha: 0.12),
+            blurRadius: AppSize.s16,
             offset: const Offset(0, 8),
           ),
         ],
@@ -57,41 +53,35 @@ class WeatherCardWidget extends StatelessWidget {
         children: [
           if (isOffline) ...[
             const OfflineBadgeWidget(),
-            SizedBox(height: 12.h),
+            SizedBox(height: AppSize.s12.h),
           ],
           Text(
             '${weather.location.name}, ${weather.location.country}',
             textAlign: TextAlign.center,
-            style: context.bold.copyWith(fontSize: 20, color: Colors.white),
+            style: context.bold.copyWith(fontSize: FontSize.s20, color: onCard),
           ),
-          SizedBox(height: 12.h),
-          // Condition icon straight from WeatherAPI's icon set.
+          SizedBox(height: AppSize.s12.h),
           CustomImage(
-            weather.current.condition.iconUrl,
-            width: 80.w,
-            height: 80.w,
-            fit: BoxFit.contain,
+            current.condition.iconUrl,
+            width: AppSize.s80.w,
+            height: AppSize.s80.w,
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: AppSize.s8.h),
           Text(
-            formatTemperature(
-              weather.current.tempC,
-              weather.current.tempF,
-              tempUnit,
-            ),
-            style: context.bold.copyWith(fontSize: 42, color: Colors.white),
+            formatTemperature(current.tempC, current.tempF, tempUnit),
+            style: context.bold.copyWith(fontSize: FontSize.s42, color: onCard),
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: AppSize.s4.h),
           Text(
-            weather.current.condition.text,
+            current.condition.text,
             style: context.regular.copyWith(
-              fontSize: 16,
-              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: FontSize.s16,
+              color: onCard.withValues(alpha: 0.85),
             ),
           ),
-          SizedBox(height: 16.h),
-          Divider(color: Colors.white.withValues(alpha: 0.25)),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppSize.s16.h),
+          Divider(color: onCard.withValues(alpha: 0.25)),
+          SizedBox(height: AppSize.s12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -99,33 +89,29 @@ class WeatherCardWidget extends StatelessWidget {
                 icon: Icons.thermostat,
                 label: LocaleKeys.weather_feelsLike.tr(),
                 value: formatTemperature(
-                  weather.current.feelslikeC,
-                  weather.current.feelslikeF,
+                  current.feelslikeC,
+                  current.feelslikeF,
                   tempUnit,
                 ),
-                iconColor: Colors.white,
-                valueColor: Colors.white,
-                labelColor: Colors.white.withValues(alpha: 0.75),
+                iconColor: onCard,
+                valueColor: onCard,
+                labelColor: mutedOnCard,
               ),
               WeatherStatWidget(
                 icon: Icons.water_drop_outlined,
                 label: LocaleKeys.weather_humidity.tr(),
-                value: '${weather.current.humidity}%',
-                iconColor: Colors.white,
-                valueColor: Colors.white,
-                labelColor: Colors.white.withValues(alpha: 0.75),
+                value: '${current.humidity}%',
+                iconColor: onCard,
+                valueColor: onCard,
+                labelColor: mutedOnCard,
               ),
               WeatherStatWidget(
                 icon: Icons.air,
                 label: LocaleKeys.weather_wind.tr(),
-                value: formatSpeed(
-                  weather.current.windKph,
-                  weather.current.windMph,
-                  speedUnit,
-                ),
-                iconColor: Colors.white,
-                valueColor: Colors.white,
-                labelColor: Colors.white.withValues(alpha: 0.75),
+                value: formatSpeed(current.windKph, current.windMph, speedUnit),
+                iconColor: onCard,
+                valueColor: onCard,
+                labelColor: mutedOnCard,
               ),
             ],
           ),

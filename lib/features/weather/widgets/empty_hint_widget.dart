@@ -1,10 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../../core/extensions/text_style_extensions.dart';
-import '../../../core/resources/app_colors.dart';
-import '../../../generated/locale_keys.g.dart';
+import 'package:weather_app/core/extensions/unified_extensions.dart';
+import 'package:weather_app/gen/locale_keys.g.dart';
 
 /// Placeholder shown before the user has searched for a city.
 class EmptyHintWidget extends StatelessWidget {
@@ -12,26 +10,23 @@ class EmptyHintWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 60.h),
-      child: Column(
-        children: [
-          Icon(
-            Icons.wb_sunny_outlined,
-            size: 64,
-            color: AppColors.primary.withValues(alpha: 0.5),
+    return Column(
+      children: [
+        Icon(
+          Icons.wb_sunny_outlined,
+          size: AppSize.s64,
+          color: context.primaryColor.withValues(alpha: 0.5),
+        ),
+        SizedBox(height: AppSize.s12.h),
+        Text(
+          LocaleKeys.home_emptyStateHint.tr(),
+          textAlign: TextAlign.center,
+          style: context.regular.copyWith(
+            fontSize: FontSize.s14,
+            color: context.secondaryTextColor,
           ),
-          SizedBox(height: 12.h),
-          Text(
-            LocaleKeys.home_emptyStateHint.tr(),
-            textAlign: TextAlign.center,
-            style: context.regular.copyWith(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ).withPadding(top: AppSize.s60.h);
   }
 }

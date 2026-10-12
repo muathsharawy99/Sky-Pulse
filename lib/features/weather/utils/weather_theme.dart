@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/core/utils/theme/color/light_theme_color.dart';
 
-import '../../../core/resources/app_colors.dart';
-
-/// Day/night gradient palette, shared by the full-screen background and
-/// the weather card so they read as one surface.
+/// Day / night gradient shared by the full-screen background and the card.
 LinearGradient weatherGradient(bool isDay) {
+  final colors = LightThemeColor();
   return LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: isDay
-        ? [AppColors.primary, const Color(0xFF56CCF2)]
-        : [AppColors.primaryDark, const Color(0xFF05060F)],
+        ? [colors.primary, colors.dayGradientEnd]
+        : [colors.primaryDark, colors.nightGradientEnd],
   );
 }
 
-/// Full-screen version. `isDay` is null until the first successful lookup
-/// — falls back to the neutral background only then, and otherwise keeps
-/// the last city's colors through loading/errors so it never flashes grey.
+/// `isDay` is null until the first successful lookup — neutral background
+/// only then; afterwards the last city's colors stay through loading / errors.
 LinearGradient screenBackgroundGradient(bool? isDay) {
   if (isDay == null) {
-    return const LinearGradient(
-      colors: [AppColors.background, AppColors.background],
-    );
+    final background = LightThemeColor().scaffoldColor;
+    return LinearGradient(colors: [background, background]);
   }
   return weatherGradient(isDay);
 }
 
-/// Foreground (text/icon) color that stays legible against
-/// [screenBackgroundGradient] for the same `isDay` value.
-Color screenForegroundColor(bool? isDay) =>
-    isDay == null ? AppColors.textPrimary : Colors.white;
+/// Text / icon color readable on [screenBackgroundGradient].
+Color screenForegroundColor(bool? isDay) => isDay == null
+    ? LightThemeColor().defaultTextColor
+    : LightThemeColor().onPrimary;
 
-/// Softer foreground color (labels, hints) for the same [screenBackgroundGradient].
+/// Softer foreground (labels, hints) for the same background.
 Color screenSecondaryForegroundColor(bool? isDay) => isDay == null
-    ? AppColors.textSecondary
-    : Colors.white.withValues(alpha: 0.75);
+    ? LightThemeColor().secondaryText
+    : LightThemeColor().onPrimary.withValues(alpha: 0.75);

@@ -4,16 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../extensions/text_style_extensions.dart';
-import '../../resources/app_colors.dart';
-import '../utils/image_type.dart';
+import '../../extensions/unified_extensions.dart';
+import '../enums/image_type.dart';
 import 'cache_network_image.dart';
 
-/// Trimmed port of the HopOn Driver `CustomImage` toolkit: network / SVG /
-/// file / asset image handling with disk-cached network loading. Lottie
-/// support and the named-route "view full image" flow were dropped since
-/// this project has no bundled Lottie assets and no route system — an
-/// optional [CustomImage.onTap] callback replaces the latter.
+/// Network / SVG / file / asset image with disk-cached network loading
+/// (trimmed port of the HopOn Driver `CustomImage`; [onTap] replaces the
+/// "view full image" route).
 class CustomImage extends StatelessWidget {
   final double? height, width;
   final String? url;
@@ -170,7 +167,7 @@ class CustomImage extends StatelessWidget {
         border: initials != null
             ? null
             : (border ?? Border.all(color: context.hoverColor)),
-        color: initials != null ? Colors.grey.shade300 : null,
+        color: initials != null ? context.placeholderColor : null,
       ),
       height: height,
       width: width,
@@ -183,7 +180,7 @@ class CustomImage extends StatelessWidget {
                         ? (height ?? 40)
                         : (width ?? 40)) *
                     0.35),
-                color: Colors.white,
+                color: context.onPrimary,
               ),
             )
           : FittedBox(
@@ -191,7 +188,7 @@ class CustomImage extends StatelessWidget {
               child: Icon(
                 Icons.broken_image_outlined,
                 color: context.hoverColor,
-                size: 30.r,
+                size: AppSize.s30.r,
               ),
             ),
     );

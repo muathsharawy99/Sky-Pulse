@@ -1,4 +1,5 @@
-import '../../../core/shared/models/base.dart';
+// ignore_for_file: must_be_immutable
+import 'package:weather_app/core/shared/models/base.dart';
 
 /// Maps the `location` object from WeatherAPI's `current.json` response.
 class LocationModel extends Model {

@@ -1,4 +1,5 @@
-import '../../../core/shared/models/base.dart';
+// ignore_for_file: must_be_immutable
+import 'package:weather_app/core/shared/models/base.dart';
 import 'condition_model.dart';
 
 /// Everything under `current` in the API response — the "right now"

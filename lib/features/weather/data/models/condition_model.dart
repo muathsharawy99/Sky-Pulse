@@ -1,4 +1,5 @@
-import '../../../core/shared/models/base.dart';
+// ignore_for_file: must_be_immutable
+import 'package:weather_app/core/shared/models/base.dart';
 
 /// The `condition` object nested inside `current` — description text,
 /// icon, and WeatherAPI's numeric condition code.

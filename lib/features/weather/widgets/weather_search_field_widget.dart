@@ -1,12 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:weather_app/core/extensions/unified_extensions.dart';
+import 'package:weather_app/gen/locale_keys.g.dart';
 
-import '../../../core/resources/app_colors.dart';
-import '../../../generated/locale_keys.g.dart';
-
-/// The city TextField + search button row. Pure presentation — reports
-/// back through [onSearch], doesn't know about cubits.
+/// City field + search button. Reports back through [onSearch].
 class WeatherSearchFieldWidget extends StatelessWidget {
   const WeatherSearchFieldWidget({
     super.key,
@@ -21,49 +19,46 @@ class WeatherSearchFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(AppSize.radiusField.r);
     return Row(
       children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            textInputAction: TextInputAction.search,
-            onSubmitted: (_) => onSearch(),
-            decoration: InputDecoration(
-              hintText: LocaleKeys.search_hint.tr(),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 14.h,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide.none,
-              ),
+        TextField(
+          controller: controller,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => onSearch(),
+          decoration: InputDecoration(
+            hintText: LocaleKeys.search_hint.tr(),
+            filled: true,
+            fillColor: context.surfaceColor,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: AppSize.s16.w,
+              vertical: AppSize.s14.h,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: radius,
+              borderSide: BorderSide.none,
             ),
           ),
-        ),
-        SizedBox(width: 10.w),
+        ).expand(),
+        SizedBox(width: AppSize.s10.w),
         SizedBox(
-          height: 50.r,
-          width: 50.r,
+          height: AppSize.s50.r,
+          width: AppSize.s50.r,
           child: ElevatedButton(
             // Disabled while loading, so taps don't stack up.
             onPressed: loading ? null : onSearch,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.primaryColor,
               padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: radius),
             ),
             child: loading
-                ? SizedBox(
-                    height: 18.h,
-                    width: 18.h,
-                    child: const CircularProgressIndicator.adaptive(),
-                  )
-                : Icon(Icons.search, color: Colors.white, size: 22.w),
+                ? CustomProgress(size: AppSize.s18.h)
+                : Icon(
+                    Icons.search,
+                    color: context.onPrimary,
+                    size: AppSize.s22.w,
+                  ),
           ),
         ),
       ],

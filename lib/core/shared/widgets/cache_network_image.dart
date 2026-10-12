@@ -10,8 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path_provider/path_provider.dart';
 
-import '../../extensions/text_style_extensions.dart';
-import '../../resources/app_colors.dart';
+import '../../extensions/unified_extensions.dart';
 import 'base_shimmer.dart';
 
 /// Disk-cached network image loader with corruption checks and retries.
@@ -252,7 +251,7 @@ class _CacheNetworkImageState extends State<CacheNetworkImage> {
             width: widget.width,
             height: widget.height,
             decoration: BoxDecoration(
-              color: AppColors.hoverColor,
+              color: context.hoverColor,
               borderRadius: widget.borderRadius ?? BorderRadius.zero,
             ),
           ),
@@ -260,13 +259,13 @@ class _CacheNetworkImageState extends State<CacheNetworkImage> {
       );
 
   Widget _buildErrorWidget() => Container(
-        margin: EdgeInsets.all(3.w),
+        margin: EdgeInsets.all(AppSize.s3.w),
         decoration: BoxDecoration(
-          borderRadius: widget.borderRadius ?? BorderRadius.circular(4.r),
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(AppSize.s4.r),
           border: widget.fallbackText != null
               ? null
-              : (widget.border ?? Border.all(color: Colors.grey.shade200)),
-          color: widget.fallbackText != null ? Colors.grey.shade300 : null,
+              : (widget.border ?? Border.all(color: context.borderLightColor)),
+          color: widget.fallbackText != null ? context.placeholderColor : null,
         ),
         height: widget.height,
         width: widget.width,
@@ -279,15 +278,18 @@ class _CacheNetworkImageState extends State<CacheNetworkImage> {
                           ? (widget.height ?? 40)
                           : (widget.width ?? 40)) *
                       0.35,
-                  color: Colors.white,
+                  color: context.onPrimary,
                 ),
               )
             : Container(
-                constraints: BoxConstraints(maxWidth: 30.w, maxHeight: 30.w),
+                constraints: BoxConstraints(
+                  maxWidth: AppSize.s30.w,
+                  maxHeight: AppSize.s30.w,
+                ),
                 alignment: Alignment.center,
                 child: FittedBox(
                   fit: BoxFit.fill,
-                  child: Icon(Icons.broken_image, color: Colors.grey.shade200),
+                  child: Icon(Icons.broken_image, color: context.borderLightColor),
                 ),
               ),
       );

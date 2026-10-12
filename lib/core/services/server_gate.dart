@@ -1,83 +1,78 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:weather_app/gen/locale_keys.g.dart';
 
-import '../extensions/cubit_enums.dart';
+import '../extensions/unified_extensions.dart';
+import '../utils/logger.dart';
 
-/// Single Dio instance for the whole app — wraps requests so callers get
-/// back a [CustomResponse] (success flag + [ErrorType] + message) instead
-/// of dealing with Dio/DioException directly.
+/// Single Dio instance for the whole app. Every call resolves to a
+/// [CustomResponse] (success flag + [ErrorType] + user-safe message).
 class ServerGate {
+  static bool logEnabled = kDebugMode;
+
+  final Dio _dio = Dio();
+
   ServerGate._() {
+    _dio.interceptors.add(CustomApiInterceptor());
     _dio.options = _dio.options.copyWith(
-      baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       responseType: ResponseType.json,
     );
-    if (kDebugMode) {
-      _dio.interceptors.add(
-        LogInterceptor(requestBody: true, responseBody: true),
-      );
-    }
   }
 
   static final ServerGate i = ServerGate._();
 
-  static const String baseUrl = 'https://api.weatherapi.com/v1/';
+  String _resolveUrl(String url) =>
+      url.startsWith('http') ? url : '${ApiConstants.baseUrl}/$url';
 
-  // Hardcoded key — fine for this task, but in a real app this belongs
-  // behind a backend/env config, not shipped in the client.
-  static const String apiKey = '6f27a7b9512c4882a45162444252101';
-
-  final Dio _dio = Dio();
-
-  /// Hits `baseUrl + url`, auto-attaching the API key to every request.
-  Future<CustomResponse> getFromServer({
+  /// GET `baseUrl/url`, the API key is attached to every request.
+  Future<CustomResponse<T>> getFromServer<T>({
     required String url,
     Map<String, dynamic>? params,
   }) async {
     try {
-      final response = await _dio.get(
-        url,
-        queryParameters: {'key': apiKey, ...?params},
+      params?.removeWhere((k, v) => v == null || '$v'.trim().isEmpty);
+      final res = await _dio.get(
+        _resolveUrl(url),
+        queryParameters: {'key': ApiConstants.apiKey, ...?params},
       );
-      return CustomResponse(
+      return CustomResponse<T>(
         success: true,
-        statusCode: response.statusCode ?? 200,
+        statusCode: res.statusCode ?? 200,
         errType: ErrorType.none,
-        data: response.data,
+        data: res.data as T?,
       );
     } on DioException catch (e) {
-      return _handleError(e);
+      return _handleError<T>(e);
     } catch (e) {
-      // Catch-all for anything that isn't a DioException.
-      return CustomResponse(
+      return CustomResponse<T>(
         success: false,
         statusCode: 500,
         errType: ErrorType.unknown,
-        msg: kDebugMode ? '$e' : 'Something went wrong, please try again.',
+        msg: kDebugMode ? '$e' : LocaleKeys.errors_unknown.tr(),
       );
     }
   }
 
-  // Maps a DioException to one of: invalid city, no internet, or other.
-  CustomResponse _handleError(DioException err) {
+  /// Invalid city (WeatherAPI codes), no internet, or anything else.
+  CustomResponse<T> _handleError<T>(DioException err) {
     if (err.type == DioExceptionType.badResponse) {
       final data = err.response?.data;
       final error = (data is Map) ? data['error'] : null;
       final message = (error is Map) ? '${error['message'] ?? ''}' : '';
       final code = (error is Map) ? error['code'] : null;
-
-      // WeatherAPI's own codes for "city not found".
-      final isInvalidCity = code == 1006 || code == 1003;
-
-      return CustomResponse(
+      final isInvalidCity = AppConstants.invalidCityCodes.contains(code);
+      return CustomResponse<T>(
         success: false,
         statusCode: err.response?.statusCode ?? 400,
         errType: isInvalidCity ? ErrorType.invalidCity : ErrorType.server,
         msg: message.isNotEmpty
             ? message
-            : 'City not found. Please check the spelling and try again.',
+            : LocaleKeys.errors_cityNotFound.tr(),
       );
     }
 
@@ -87,36 +82,79 @@ class ServerGate {
         err.type == DioExceptionType.receiveTimeout ||
         err.type == DioExceptionType.connectionError ||
         err.response == null) {
-      return CustomResponse(
+      return CustomResponse<T>(
         success: false,
         statusCode: 0,
         errType: ErrorType.network,
-        msg: 'Please check your internet connection and try again.',
+        msg: LocaleKeys.errors_network.tr(),
       );
     }
 
-    return CustomResponse(
+    return CustomResponse<T>(
       success: false,
       statusCode: err.response?.statusCode ?? 500,
       errType: ErrorType.unknown,
-      msg: 'Something went wrong, please try again.',
+      msg: LocaleKeys.errors_unknown.tr(),
     );
   }
 }
 
-/// What every API call resolves to — success flag, [ErrorType], message,
-/// and the raw data payload on success.
-class CustomResponse {
+class CustomApiInterceptor extends Interceptor {
+  final _log = LoggerDebug(
+    headColor: LogColors.red,
+    constTitle: 'Server Gate Logger',
+    enabled: ServerGate.logEnabled,
+  );
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    _log.red(
+      '------ Current Error Response (status code ${err.response?.statusCode}) -----',
+    );
+    _log.red(jsonEncode(err.response?.data));
+    _log.white(_curl(err.requestOptions));
+    super.onError(err, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    _log.green(
+      '------ Current Response (status code ${response.statusCode}) ------',
+    );
+    _log.green(jsonEncode(response.data));
+    _log.white(_curl(response.requestOptions));
+    super.onResponse(response, handler);
+  }
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    _log.yellow('------ Current Request Path -----');
+    _log.yellow(
+      '${options.path} ${LogColors.red}API METHOD : (${options.method})${LogColors.reset}',
+    );
+    _log.blue('------ Current Request Parameters Data -----');
+    _log.blue(jsonEncode(options.queryParameters));
+    super.onRequest(options, handler);
+  }
+
+  String _curl(RequestOptions options) {
+    final curl = StringBuffer("curl -X ${options.method} '${options.uri}'");
+    options.headers.forEach((key, value) => curl.write(" -H '$key: $value'"));
+    return curl.toString();
+  }
+}
+
+class CustomResponse<T> {
   bool success;
   ErrorType errType;
   String msg;
   int statusCode;
-  dynamic data;
+  T? data;
 
   CustomResponse({
     this.success = false,
     this.errType = ErrorType.none,
-    this.msg = '',
+    this.msg = "",
     this.statusCode = 0,
     this.data,
   });

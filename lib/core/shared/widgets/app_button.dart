@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../extensions/text_style_extensions.dart';
-import '../../resources/app_colors.dart';
+import '../../extensions/unified_extensions.dart';
 
-/// One shared button style, used by the error retry button and settings Save.
+/// Shared primary button (error retry, settings Save).
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
@@ -22,34 +21,30 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48.h,
+      height: AppSize.s48.h,
       child: ElevatedButton(
         onPressed: loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: context.primaryColor,
+          foregroundColor: context.onPrimary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(AppSize.radiusField.r),
           ),
         ),
         child: loading
-            ? SizedBox(
-                height: 20.h,
-                width: 20.h,
-                child: const CircularProgressIndicator.adaptive(),
-              )
+            ? CustomProgress(size: AppSize.s20.h, color: context.onPrimary)
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, size: 18),
-                    SizedBox(width: 8.w),
+                    Icon(icon, size: AppSize.s18),
+                    SizedBox(width: AppSize.s8.w),
                   ],
                   Text(
                     label,
                     style: context.semiBold.copyWith(
-                      fontSize: 15,
-                      color: Colors.white,
+                      fontSize: FontSize.s15,
+                      color: context.onPrimary,
                     ),
                   ),
                 ],

@@ -2,5 +2,20 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   errors:
-    constant_identifier_names: ignore
     unused_import: error
+    prefer_const_constructors: error
+    prefer_const_literals_to_create_immutables: error
+    unnecessary_const: error
+    avoid_unnecessary_containers: error
+    test_types_in_equals: error
+    unrelated_type_equality_checks: error
+    must_be_immutable: ignore
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    unnecessary_const: true
+    avoid_unnecessary_containers: true
+    test_types_in_equals: true
+    unrelated_type_equality_checks: true
